@@ -21,6 +21,32 @@ router.get('/', cors.corsWithOptions, (req,res,next) => {
     .catch((err) => next(err));
 })
 
+// router.post('/signup', cors.corsWithOptions, (req, res, next) => {
+//   User.register(new User({username: req.body.username}), 
+//     req.body.password, (err, user) => {
+//     if(err) {
+//       res.statusCode = 500;
+//       res.setHeader('Content-Type', 'application/json');
+//       res.json({err: err});
+//     }
+//     else {
+//       user.save((err, user) => {
+//         if (err) {
+//           res.statusCode = 500;
+//           res.setHeader('Content-Type', 'application/json');
+//           res.json({err: err});
+//           return ;
+//         }
+//         passport.authenticate('local')(req, res, () => {
+//           res.statusCode = 200;
+//           res.setHeader('Content-Type', 'application/json');
+//           res.json({success: true, status: 'Registration Successful!'});
+//         });
+//       });
+//     }
+//   });
+// });
+
 router.post('/signup', cors.corsWithOptions, (req, res, next) => {
   const {errors, isValid} = validateSignUpInput(req.body);
   const {username, email, password} = req.body;
@@ -29,44 +55,28 @@ router.post('/signup', cors.corsWithOptions, (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.json(errors);
   }
-  User.findOne({$or:[{email},{username}]}).then(user => {
-    if (user) {
-      if (user.email === email) {
-        res.statusCode = 400;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({email: 'Email already exists'});
-      }
-      else {
-        res.statusCode = 400;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({ username: "Username already exists" });
-      }
-    } 
-    else {
-      User.register(new User({username: username}), password, (err, user) => {
-        if(err) {
+    User.register(new User({username, email}), password, (err, user) => {
+      // if(err) {
+      //   res.statusCode = 500;
+      //   res.setHeader('Content-Type', 'application/json');
+      //   res.json({err: err});
+      // }
+      console.log(user)
+      // user.email = req.body.email;
+      user.save((err, user) => {
+        if (err) {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
           res.json({err: err});
         }
-        else {
-          user.email = email;
-          user.save((err, user) => {
-            if (err) {
-              res.statusCode = 500;
-              res.setHeader('Content-Type', 'application/json');
-              res.json({err: err});
-            }
-            passport.authenticate('local')(req, res, () => {
-              res.statusCode = 200;
-              res.setHeader('Content-Type', 'application/json');
-              res.json({success: true, status: 'Registration Successful!'});
-            });
-          });
-        }
+
+        passport.authenticate('local')(req, res, () => {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: true, status: 'Registration Successful!'});
+        });
       });
-    }
-  })
+    });
 });
 
 

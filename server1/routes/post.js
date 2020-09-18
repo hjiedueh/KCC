@@ -23,7 +23,10 @@ postRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+
+postRouter.route('/create')
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+.post(cors.cors, authenticate.verifyUser, (req, res, next) => {
 	req.body.author = req.user._id;
     const post = req.body;
     const { errors, isValid } = validatePostInput(post);

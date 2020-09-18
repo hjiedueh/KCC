@@ -12,10 +12,8 @@ const config = require('./config');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const postRouter = require('./routes/post');
-// const promoRouter = require('./routes/promoRouter');
-// const leaderRouter = require('./routes/leaderRouter');
-// const uploadRouter = require('./routes/uploadRouter');
-// const faveRouter = require('./routes/faveRouter');
+const musicRouter = require('./routes/music');
+
 
 const app = express();
 
@@ -59,13 +57,12 @@ app.use('/users', usersRouter);
 
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 
 app.use('/posts', postRouter);
-// app.use('/promotions',promoRouter);
-// app.use('/leaders',leaderRouter);
-// app.use('/imageUpload',uploadRouter);
-// app.use('/favorites',faveRouter);
+app.use('/music', musicRouter);
+
 
 //Connect to db
 const mongoose = require('mongoose');
