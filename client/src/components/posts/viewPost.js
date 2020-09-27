@@ -5,7 +5,6 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import "./post.scss";
 
 const ViewPost = ({ post, auth, onDelete, onEdit }) => {
-   const postDate = getFormattedDate(post.date);
    return (
       <Container className="mt-4 viewPost">
          <Row>
@@ -18,7 +17,6 @@ const ViewPost = ({ post, auth, onDelete, onEdit }) => {
          </Row>
          <Row className="d-flex flex-column font-italic footerStyle">
             <Col>Created by : {post.author}</Col>
-            <Col>Date: {postDate}</Col>
          </Row>
          {auth && (
             <Row className="mt-4">

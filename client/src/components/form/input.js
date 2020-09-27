@@ -1,6 +1,25 @@
 import React from "react";
+import ReactDOM from 'react-dom';
+import { useField } from 'formik';
 import Form from "react-bootstrap/Form";
 import PropTypes from 'prop-types';
+
+// const Input = ({ label, ...props }) => {
+//    const [field, meta] = useField(props);
+//    return (
+//       <Form.Group controlId={props.name}>
+//          <Form.Label>{label}</Form.Label>
+//          <Form.Control
+//             {...field} {...props}
+//          />
+//          <Form.Control.Feedback type="invalid">
+//             {meta.error}
+//          </Form.Control.Feedback>
+//       </Form.Group>
+//    );
+// };
+
+
 
 const Input = ({ name, type, placeholder, value, onChange, onBlur, text }) => {
    return (

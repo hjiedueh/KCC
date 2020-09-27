@@ -33,8 +33,9 @@ export const createPost = (postData, history) => dispatch => {
 export const getPostByID = id => dispatch => {
    dispatch(togglePostLoading());
    axios
-      .get(`/posts/${id}`)
+      .get(`/posts/post/${id}`)
       .then(res => {
+         console.log(res.data)
          dispatch({
             type: GET_POST,
             payload: res.data

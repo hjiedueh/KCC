@@ -8,7 +8,7 @@ import { clearErrors } from "../../actions/errorActions";
 
 const LoginPage = ({ loginUser, auth, errors, history, clearErrors }) => {
    const [user, setUser] = useState({
-      username: "",
+      email: "",
       password: "",
       errors: {}
    });
@@ -49,8 +49,8 @@ const LoginPage = ({ loginUser, auth, errors, history, clearErrors }) => {
 
    const handleSubmit = e => {
       e.preventDefault();
-      const { username, password } = user;
-      loginUser({ username, password });
+      const { email, password } = user;
+      loginUser({ email, password });
    };
 
    return (

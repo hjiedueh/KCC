@@ -1,124 +1,103 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const Post = require('../models/post');
-const cors = require('./cors');
-const authenticate = require('../authenticate');
+const express = require("express");
+const router = express.Router();
+const Post = require("../models/post");
+const passport = require("passport");
 const validatePostInput = require("../validators/post");
 
-const postRouter = express.Router();
+// @route - GET api/posts/:author
+// @desc - get blog posts of the current user
+// @access - public
 
-postRouter.use(bodyParser.json());
+router.get(
+   "/",
+   passport.authenticate("jwt", { session: false }),
+   (req, res) => {
+      Post.find({ author: req.user.user_name })
+         .then(posts => res.status(200).json(posts))
+         .catch(err =>
+            res
+               .status(400)
+               .json({ user: "Error fetching posts of logged in user" })
+         );
+   }
+);
 
-postRouter.route('/')
-.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
-.get(cors.cors, (req,res,next) => {
-    Post.find({}).sort({ createdAt: -1 })
-    .populate('author')
-    // .populate('comments.author')
-    .then((post) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(post);
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-
-postRouter.route('/create')
-.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
-.post(cors.cors, authenticate.verifyUser, (req, res, next) => {
-	req.body.author = req.user._id;
-    const post = req.body;
-    const { errors, isValid } = validatePostInput(post);
-    if (!isValid) {
-    	return res.status(400).json(errors);
-    }
-    Post.create(req.body)
-    .then((post) => {
-        console.log('Post Created', post);
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(post);
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    res.statusCode = 403;
-    res.end('PUT operation not supported on this route');
-})
-.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    res.statusCode = 403;
-    res.end('Delete operation not supported on this route');
-})
-
-postRouter.route('/:postId')
-.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
-.get(cors.cors, (req,res,next) => {
-    Post.findById(req.params.postId)
-    .populate('author')
-    // .populate('comments.author')
-    .then((post) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(post);
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    res.statusCode = 403;
-    res.end('POST operation not supported'+ req.params.postId);
-})
-.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    const { errors, isValid } = validatePostInput(req.body);
-	if (!isValid) {
-    	return res.status(400).json(errors);
-    }
-    const { title, body } = req.body;
-    Post.findByIdAndUpdate(req.params.postId, {
-        $set: { title, body }
-    }, { new: true })
-    .then((post) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(post);
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Post.findByIdAndRemove(req.params.postId)
-    .then((resp) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(resp);
-    }, (err) => next(err))
-    .catch((err) => next(err));
+router.get("/post/:id", (req, res) => {
+   Post.find({ _id: req.params.id })
+      .then(post => res.status(200).json(post))
+      .catch(err => res.status(400).json({ id: "Error fetching post by id" }));
 });
 
-// postRouter.route('/:username')
-// .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
-// .get(cors.cors, (req,res,next) => {
-//     Post.find({username: req.params.username})
-//     .populate('author')
-//     // .populate('comments.author')
-//     .then((post) => {
-//         res.statusCode = 200;
-//         res.setHeader('Content-Type', 'application/json');
-//         res.json(post);
-//     }, (err) => next(err))
-//     .catch((err) => next(err));
-// })
-// postRouter.route('/:username/:postId')
-// .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
-// .get(cors.cors, (req,res,next) => {
-//     Post.findById(req.params.postId)
-//     .populate('author')
-//     .populate('comments.author')
-//     .then((post) => {
-//         res.statusCode = 200;
-//         res.setHeader('Content-Type', 'application/json');
-//         res.json(post);
-//     }, (err) => next(err))
-//     .catch((err) => next(err));
-// })
+router.get("/author/:author", (req, res) => {
+   Post.find({ author: req.params.author })
+      .then(posts => res.status(200).json(posts))
+      .catch(err =>
+         res
+            .status(400)
+            .json({ author: "Error fetching posts of specific author" })
+      );
+});
 
-module.exports = postRouter;
+router.post(
+   "/create",
+   passport.authenticate("jwt", { session: false }),
+   (req, res) => {
+      const author = req.user.user_name;
+      const post = req.body;
+      const { errors, isValid } = validatePostInput(post);
+      if (!isValid) {
+         return res.status(400).json(errors);
+      }
+      post.author = author;
+      const newPost = new Post(post);
+      newPost
+         .save()
+         .then(doc => res.json(doc))
+         .catch(err => console.log({ create: "Error creating new post" }));
+   }
+);
+
+// @route - PUT api/posts/update/:id
+// @desc - updates an existing post
+// @access - private
+
+router.patch(
+   "/update/:id",
+   passport.authenticate("jwt", { session: false }),
+   (req, res) => {
+      const author = req.user.user_name;
+      const { errors, isValid } = validatePostInput(req.body);
+      if (!isValid) {
+         return res.status(400).json(errors);
+      }
+      const { title, body } = req.body;
+      Post.findOneAndUpdate(
+         { author, _id: req.params.id },
+         { $set: { title, body } },
+         { new: true }
+      )
+         .then(doc => res.status(200).json(doc))
+         .catch(err =>
+            res.status(400).json({ update: "Error updating existing post" })
+         );
+   }
+);
+
+// @route - DELETE api/posts/delete/:id
+// @desc - deletes a post
+// @access - private
+
+router.delete(
+   "/delete/:id",
+   passport.authenticate("jwt", { session: false }),
+   (req, res) => {
+      const author = req.user.user_name;
+      Post.findOneAndDelete({ author, _id: req.params.id })
+         .then(doc => res.status(200).json(doc))
+         .catch(err =>
+            res.status(400).json({ delete: "Error deleting a post" })
+         );
+   }
+);
+
+module.exports = router;

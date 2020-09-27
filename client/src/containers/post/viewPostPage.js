@@ -14,6 +14,7 @@ const ViewPostPage = ({
 }) => {
    useEffect(() => {
       getPostByID(match.params.id);
+      console.log(match.params.id)
    }, [match, getPostByID]);
 
    const handleEdit = () => {

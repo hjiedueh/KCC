@@ -5,7 +5,7 @@
 .grid-container {
    display: grid;
    grid-template-columns: repeat(auto-fit, minmax(260px, 400px));
-   grid-gap: 1em;
+   grid-gap: 1.75em;
 }
 
 a:link {

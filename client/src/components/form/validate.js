@@ -28,6 +28,12 @@ const Validate = (name, value) => {
       case "body":
          errors.body = value.length === 0 ? "Description is required" : "";
          break;
+      case "artist":
+         errors.artist = value.length === 0 ? "Artist is required" : "";
+         break;
+      case "file":
+         errors.file = value === null ? "File is required" : "";
+         break;
       default:
          break;
    }

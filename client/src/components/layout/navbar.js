@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Navbar, Nav, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import "./navbar.scss";
 
 const Navigationbar = ({ auth, onClick }) => (
 	<Navbar
@@ -11,29 +12,23 @@ const Navigationbar = ({ auth, onClick }) => (
       	className="mb-3"
       	style={{ minHeight: "4rem" }}
    	>
-    	<Link to="/blog">
-			<Navbar.Brand href="/"><h1>KCC</h1></Navbar.Brand>
+    	<Link to="/">
+			<Navbar.Brand><h1>KCC</h1></Navbar.Brand>
 		</Link>
       	<Nav className="ml-auto">
       		{auth ? (
       			<div>
-					<Link to="/logout">
-						<Button variant="primary" onClick={onClick}>
-				        	Logout
-				      	</Button>
+					<Link className="user-link" to="/logout">
+				        Logout
 				    </Link>
 			    </div>
 	      	) : (
 	      		<div>
-		      		<Link to="/login">
-			      		<Button variant="primary">
-				        	Login
-				      	</Button>
+		      		<Link className="user-link" to="/login">
+				        Login
 			      	</Link>
-			      	<Link to="/signup">
-				      	<Button variant="primary">
-				        	Register
-				      	</Button>
+			      	<Link className="user-link" to="/signup">
+				        Register
 				    </Link>
 			    </div>
 	      	)}

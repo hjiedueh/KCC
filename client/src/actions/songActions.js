@@ -43,7 +43,7 @@ export const getSongByID = id => dispatch => {
 
       	.catch(err => {
          	dispatch(setErrors(err.response.data));
-         	dispatch(togglePostLoading());
+         	dispatch(toggleSongLoading());
       	});
 }
 

@@ -12,6 +12,7 @@ import SignUpPage from "./containers/auth/signupPage";
 import ProgressBar from "./containers/layout/progressbar";
 import Navbar from "./containers/layout/navbar";
 import Landing from "./components/layout/landing";
+import HomePage from "./containers/homePage";
 import BlogPage from "./containers/blogPage";
 import PrivateRoute from "./utils/privateRoute";
 
@@ -20,6 +21,8 @@ import CreatePostPage from "./containers/post/createPostPage";
 import UpdatePostPage from "./containers/post/updatePostPage";
 
 import SongPlayer from "./music-player/song-player";
+
+import UploadPage from "./containers/music/UploadPage";
 
 if (localStorage.jwtToken) {
    const token = localStorage.jwtToken;
@@ -40,7 +43,7 @@ const App = () => {
             <ProgressBar />
             <Navbar />
             <Switch>
-               <Route path="/" exact component={Landing} />
+               <Route path="/" exact component={HomePage} />
                <Route path="/login" component={LoginPage} />
                <Route path="/signup" component={SignUpPage} />
                <PrivateRoute exact path="/blog" component={BlogPage} />
@@ -53,6 +56,11 @@ const App = () => {
                   exact
                   path="/blog/post/update/:id"
                   component={UpdatePostPage}
+               />
+               <PrivateRoute
+                  exact
+                  path="/blog/music/upload"
+                  component={UploadPage}
                />
                <Route exact path="/blog/post/:id" component={ViewPostPage} />
                <Route path="/blog/:author" component={BlogPage} />
